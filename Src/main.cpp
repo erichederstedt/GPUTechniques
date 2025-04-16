@@ -67,9 +67,9 @@ std::vector<Folder> folders;
 
 #include "yaml.hpp"
 #pragma warning(disable: 4189)
-std::string parse_article(std::string path, std::string title)
+std::string parse_article(std::string path, std::string title, std::string template_path = "template_article.html", bool in_folder = true)
 {
-    std::string template_article = load_file("template_article.html");
+    std::string template_article = load_file(template_path);
     size_t index_folders = init_index(template_article, "***folders***");
     size_t index_title = init_index(template_article, "***title***");
     size_t index_description = init_index(template_article, "***description***");
@@ -77,17 +77,31 @@ std::string parse_article(std::string path, std::string title)
     size_t index_content = init_index(template_article, "***content***");
 
     std::string article_contents = load_file(path+".html");
-    TINY_YAML::Yaml coolYamlObject(path+".yaml");
+    TINY_YAML::Yaml* coolYamlObject = nullptr;
+    if (index_description != SIZE_MAX && index_requirements != SIZE_MAX)
+        coolYamlObject = new TINY_YAML::Yaml(path+".yaml");
 
-    template_article.insert(index_content, article_contents);
-    template_article.insert(index_requirements, coolYamlObject["requirements"].getData<std::string>());
-    template_article.insert(index_description, coolYamlObject["description"].getData<std::string>());
-    template_article.insert(index_title, title);
+    if (index_content != SIZE_MAX)
+        template_article.insert(index_content, article_contents);
+    if (index_requirements != SIZE_MAX && coolYamlObject)
+        template_article.insert(index_requirements, (*coolYamlObject)["requirements"].getData<std::string>());
+    if (index_description != SIZE_MAX && coolYamlObject)
+        template_article.insert(index_description, (*coolYamlObject)["description"].getData<std::string>());
+    if (index_title != SIZE_MAX)
+        template_article.insert(index_title, title);
     
     std::string shit_string;
     size_t folder_count = 0;
     for (Folder& folder : folders)
     {
+        std::string in_folder_escape;
+        if (in_folder)
+            in_folder_escape = "../";
+        
+        shit_string.append("<div id=\"folder-content-" + std::to_string(999) + "\" class=\"folder-content\">\n");
+        shit_string.append(std::string("<button onclick=\"window.location.href='") + in_folder_escape + std::string("index.html") + std::string("';\">") + "Home" + std::string("</button>"));
+        shit_string.append("</div>\n");
+
         shit_string.append("<div class=\"nav-folder\">\n");
         shit_string.append("<div class=\"folder-header\" onclick=\"toggleFolder('folder-content-" + std::to_string(folder_count) + "', this)\">\n");
         shit_string.append("<span id=\"arrow-" + std::to_string(folder_count) + "\">▼</span> " + folder.name + "\n");
@@ -95,14 +109,16 @@ std::string parse_article(std::string path, std::string title)
         shit_string.append("<div id=\"folder-content-" + std::to_string(folder_count) + "\" class=\"folder-content\">\n");
         for (Article& article : folder.articles)
         {
-            shit_string.append(std::string("<button onclick=\"window.location.href='../") + std::string(article.path + ".html") + std::string("';\">") + article.name + std::string("</button>"));
+            shit_string.append(std::string("<button onclick=\"window.location.href='") + in_folder_escape + std::string(article.path + ".html") + std::string("';\">") + article.name + std::string("</button>"));
         }
         shit_string.append("</div>\n");
         shit_string.append("</div>\n");
         folder_count++;
     }
-    // shit_string.append("</div>\n");
     template_article.insert(index_folders, shit_string);
+
+    if(coolYamlObject)
+        delete coolYamlObject;
 
     return template_article;
 }
@@ -178,6 +194,10 @@ int main(void)
             save_to_file("generated/" + article.parent_path, article.name + ".html", article.article);
         }
     }
+
+    std::string index_article = parse_article("index", "Introduction", "template_index.html", false);
+    save_to_file("generated/", "index.html", index_article);
+
     std::cout << "Hello World!\n";
     
     return 0;

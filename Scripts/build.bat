@@ -8,7 +8,7 @@ if errorlevel 1 (
     call "run_vcvar.bat"
 )
 
-call "copy_asan_dll.bat"
+rem call "copy_asan_dll.bat"
 
 pushd ..
 
@@ -24,8 +24,8 @@ IF "%~1"=="" (
 )
 
 rem /O2
-@set CC=cl
-@set FLAGS=/std:c++17 /D_CRT_SECURE_NO_WARNINGS /fsanitize=address /DSDL_MAIN_HANDLED /Z7 /W4 /WX /MP /EHsc /I "./Include"
+@set CC=cl /fsanitize=address
+@set FLAGS=/std:c++17 /D_CRT_SECURE_NO_WARNINGS /DSDL_MAIN_HANDLED /Z7 /W4 /WX /MP /EHsc /I "./Include"
 @set "SRC_FILES="
 rem set "SRC_FILES=!SRC_FILES! "Src/main.cpp""
 for /r "Src" %%I in (*.c) do (
