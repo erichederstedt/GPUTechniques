@@ -17,3 +17,9 @@ jobs:
         Scripts\\build.bat
         cd Site
         site_generator.exe
+    - name: run
+      shell: cmd
+      run: | 
+        cd Site
+        site_generator.exe
+        echo %DIR%
