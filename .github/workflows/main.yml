@@ -2,14 +2,15 @@ name: Generate Site
 
 on:
   workflow_dispatch:
-
+permissions:
+  contents: write
 jobs:
   windows:
     name: run on windows
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: ilammy/msvc-dev-cmd@v1.4.1
     - name: compile
       run: | 
-        cl main.cpp /Fe:spark /std:c++latest
+        call Scripts\\build.bat
