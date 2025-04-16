@@ -1,0 +1,4 @@
+site/generated
+site/clang_rt.asan_dynamic-x86_64.dll
+site/site_generator.exe
+site/site_generator.pdb
