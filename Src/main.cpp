@@ -91,17 +91,18 @@ std::string parse_article(std::string path, std::string title, std::string templ
         template_article.insert(index_title, title);
     
     std::string shit_string;
+
+    std::string in_folder_escape;
+        if (in_folder)
+            in_folder_escape = "../";
+
+    shit_string.append("<div class=\"nav-link\">");
+    shit_string.append("<button onclick=\"window.location.href='" + in_folder_escape + "index.html" + "';\">Introduction</button>");
+    shit_string.append("</div>");
+
     size_t folder_count = 0;
     for (Folder& folder : folders)
     {
-        std::string in_folder_escape;
-        if (in_folder)
-            in_folder_escape = "../";
-        
-        shit_string.append("<div id=\"folder-content-" + std::to_string(999) + "\" class=\"folder-content\">\n");
-        shit_string.append(std::string("<button onclick=\"window.location.href='") + in_folder_escape + std::string("index.html") + std::string("';\">") + "Home" + std::string("</button>"));
-        shit_string.append("</div>\n");
-
         shit_string.append("<div class=\"nav-folder\">\n");
         shit_string.append("<div class=\"folder-header\" onclick=\"toggleFolder('folder-content-" + std::to_string(folder_count) + "', this)\">\n");
         shit_string.append("<span id=\"arrow-" + std::to_string(folder_count) + "\">▼</span> " + folder.name + "\n");
