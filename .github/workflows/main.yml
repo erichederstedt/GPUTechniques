@@ -15,3 +15,5 @@ jobs:
       shell: cmd
       run: | 
         Scripts\\build.bat
+        cd Site
+        site_generator.exe
